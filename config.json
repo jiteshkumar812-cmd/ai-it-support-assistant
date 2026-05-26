@@ -1,6 +1,7 @@
 {
-  "resourceGroup": "rg-aiit-tfstate",
-  "location": "southeastasia",
-  "acrName": "acritsupport",
-  "aksClusterName": "aks-it-support"
+  "resourceGroup": "rg-aiit-dev",
+  "location": "centralindia",
+  "acrName": "acraiitdev001",
+  "aksClusterName": "aks-aiit-dev",
+  "keyVaultName": "kv-aiit-dev-001"
 }

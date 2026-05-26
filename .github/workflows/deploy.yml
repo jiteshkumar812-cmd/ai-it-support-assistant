@@ -9,10 +9,10 @@ permissions:
   contents: read
 
 env:
-  ACR_NAME: acritsupport
-  ACR_LOGIN_SERVER: acritsupport.azurecr.io
-  AKS_RESOURCE_GROUP: rg-aiit-tfstate
-  AKS_CLUSTER_NAME: aks-it-support
+  ACR_NAME: acraiitdev001
+  ACR_LOGIN_SERVER: acraiitdev001.azurecr.io
+  AKS_RESOURCE_GROUP: rg-aiit-dev
+  AKS_CLUSTER_NAME: aks-aiit-dev
   K8S_NAMESPACE: aks-apps
 
 jobs:
@@ -44,8 +44,8 @@ jobs:
       - name: Set AKS context
         uses: azure/aks-set-context@v4
         with:
-          resource-group: $AKS_RESOURCE_GROUP
-          cluster-name: $AKS_CLUSTER_NAME
+          resource-group: ${{ env.AKS_RESOURCE_GROUP }}
+          cluster-name: ${{ env.AKS_CLUSTER_NAME }}
 
       - name: Update Kubernetes manifests
         run: |
