@@ -14,7 +14,19 @@ spec:
         app: backend
     spec:
       containers:
-      - name: backend
-        image: acraiitdev001.azurecr.io/backend:latest
-        ports:
-        - containerPort: 3000
+        - name: backend
+          image: acraiitdev001.azurecr.io/backend:v1
+          ports:
+            - containerPort: 3000
+          readinessProbe:
+            httpGet:
+              path: /api/tickets
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/tickets
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
