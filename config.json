@@ -1,0 +1,6 @@
+{
+  "resourceGroup": "rg-aiit-tfstate",
+  "location": "southeastasia",
+  "acrName": "acritsupport",
+  "aksClusterName": "aks-it-support"
+}

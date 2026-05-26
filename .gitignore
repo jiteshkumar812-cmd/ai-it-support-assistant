@@ -1,0 +1,17 @@
+.DS_Store
+node_modules
+.env
+*.log
+dist
+build
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
