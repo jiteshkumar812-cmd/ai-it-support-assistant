@@ -1,0 +1,60 @@
+name: Deploy to AKS
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+env:
+  ACR_NAME: acritsupport
+  ACR_LOGIN_SERVER: acritsupport.azurecr.io
+  AKS_RESOURCE_GROUP: rg-aiit-tfstate
+  AKS_CLUSTER_NAME: aks-it-support
+  K8S_NAMESPACE: aks-apps
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to ACR
+        run: az acr login --name $ACR_NAME
+
+      - name: Build and push frontend image
+        run: |
+          docker build --platform linux/amd64 -t $ACR_LOGIN_SERVER/frontend:${{ github.sha }} ./frontend
+          docker push $ACR_LOGIN_SERVER/frontend:${{ github.sha }}
+
+      - name: Build and push backend image
+        run: |
+          docker build --platform linux/amd64 -t $ACR_LOGIN_SERVER/backend:${{ github.sha }} ./backend
+          docker push $ACR_LOGIN_SERVER/backend:${{ github.sha }}
+
+      - name: Set AKS context
+        uses: azure/aks-set-context@v4
+        with:
+          resource-group: $AKS_RESOURCE_GROUP
+          cluster-name: $AKS_CLUSTER_NAME
+
+      - name: Update Kubernetes manifests
+        run: |
+          sed -i "s|image: .*frontend:.*|image: $ACR_LOGIN_SERVER/frontend:${{ github.sha }}|g" infra/modules/envs/dev/k8s/frontend-deployment.yaml
+          sed -i "s|image: .*backend:.*|image: $ACR_LOGIN_SERVER/backend:${{ github.sha }}|g" infra/modules/envs/dev/k8s/backend-deployment.yaml
+
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f infra/modules/envs/dev/k8s/backend-deployment.yaml
+          kubectl apply -f infra/modules/envs/dev/k8s/frontend-deployment.yaml
+          kubectl rollout status deployment/backend -n $K8S_NAMESPACE
+          kubectl rollout status deployment/frontend -n $K8S_NAMESPACE
